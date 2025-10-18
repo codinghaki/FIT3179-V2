@@ -1,0 +1,84 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "National monthly averages heatmap",
+
+    "width": "container",
+
+    "height": 100,
+
+    "data": { "url": "data/passenger_data_two_year.csv" },
+
+    "transform": [
+        { "filter": "datum.AIRPORT === 'All Australian Airports'" },
+        { "calculate": "toDate(datum.ym)", "as": "dt" },
+        { "calculate": "year(datum.dt)", "as": "yr" },
+        { "calculate": "month(datum.dt)", "as": "mo" },
+
+        {
+            "aggregate": [
+                { "op": "sum", "field": "Pax_Total", "as": "month_total" }
+            ],
+            "groupby": ["yr", "mo"]
+        },
+
+        {
+            "impute": "month_total",
+            "key": "mo",
+            "keyvals": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            "groupby": ["yr"],
+            "value": 0
+        },
+
+        {
+            "calculate": "datum.month_total > 0 ? datum.month_total : null",
+            "as": "month_total_pos"
+        }
+    ],
+
+    "mark": { "type": "rect", "stroke": "#fff", "strokeWidth": 1 },
+
+    "encoding": {
+        "y": {
+            "field": "yr",
+            "type": "ordinal",
+            "title": null,
+            "scale": { "domain": [2023, 2024, 2025] }
+        },
+        "x": {
+            "field": "mo",
+            "type": "ordinal",
+            "title": null,
+            "sort": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            "axis": {
+                "labelExpr": "['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][datum.value]",
+                "labelAngle": 0
+            }
+        },
+
+        "color": {
+            "condition": {
+                "test": "datum.month_total === 0",
+                "value": "#eeeeee"
+            },
+            "field": "month_total_pos",
+            "type": "quantitative",
+            "title": "Passengers",
+            "scale": { "scheme": "purples" },
+            "legend": { "format": "~s" }
+        },
+
+        "tooltip": [
+            { "field": "yr", "title": "Year" },
+            {
+                "field": "mo",
+                "title": "Month",
+                "type": "ordinal",
+                "labelExpr": "['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][datum.value]"
+            },
+            { "field": "month_total", "title": "Passengers", "format": ",.0f" }
+        ]
+    },
+
+    "config": { "view": { "stroke": null } }
+}

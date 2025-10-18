@@ -1,0 +1,257 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Monthly Anomaly vs 24-Month Mean (Jun 2023–Jun 2025)",
+
+    "width": "container",
+
+    "layer": [
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+                { "timeUnit": "yearmonth", "field": "dt", "as": "ym" },
+                { "calculate": "month(datum.dt)", "as": "mm" },
+                {
+                    "filter": "datum.mm == 11 || datum.mm == 0 || datum.mm == 1"
+                },
+                {
+                    "aggregate": [{ "op": "count", "as": "n" }],
+                    "groupby": ["ym"]
+                }
+            ],
+            "mark": { "type": "rect", "color": "#f59e0b", "opacity": 0.5 },
+            "encoding": {
+                "x": {
+                    "field": "ym",
+                    "type": "temporal",
+                    "timeUnit": "yearmonth"
+                },
+                "y": { "value": 0 },
+                "y2": { "value": 200 }
+            }
+        },
+
+        {
+            "mark": { "type": "rule", "color": "#9ca3af" },
+            "encoding": { "y": { "value": 0 } }
+        },
+
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "filter": "datum.AIRPORT == 'All Australian Airports'" },
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+                { "timeUnit": "yearmonth", "field": "dt", "as": "ym" },
+                {
+                    "aggregate": [
+                        {
+                            "op": "sum",
+                            "field": "Pax_Total",
+                            "as": "national_total"
+                        }
+                    ],
+                    "groupby": ["ym"]
+                },
+                {
+                    "joinaggregate": [
+                        {
+                            "op": "mean",
+                            "field": "national_total",
+                            "as": "mean_nat"
+                        }
+                    ]
+                },
+                {
+                    "calculate": "datum.national_total - datum.mean_nat",
+                    "as": "anomaly"
+                },
+                {
+                    "calculate": "datum.anomaly / datum.mean_nat",
+                    "as": "anomaly_pct"
+                }
+            ],
+            "mark": { "type": "bar" },
+            "encoding": {
+                "x": {
+                    "field": "ym",
+                    "type": "temporal",
+                    "timeUnit": "yearmonth",
+                    "title": "Month",
+                    "axis": { "format": "%b", "labelAngle": 0 },
+                    "scale": { "band": 1 }
+                },
+                "y": {
+                    "field": "anomaly",
+                    "type": "quantitative",
+                    "title": "Anomaly vs 24-month mean",
+                    "axis": { "format": ",.0s", "grid": false }
+                },
+                "color": {
+                    "condition": {
+                        "test": "datum.anomaly >= 0",
+                        "value": "#16a34a"
+                    },
+                    "value": "#ef4444"
+                },
+                "tooltip": [
+                    {
+                        "field": "ym",
+                        "type": "temporal",
+                        "title": "Month",
+                        "format": "%b %Y"
+                    },
+                    {
+                        "field": "national_total",
+                        "type": "quantitative",
+                        "format": ",.0f",
+                        "title": "Passengers"
+                    },
+                    {
+                        "field": "mean_nat",
+                        "type": "quantitative",
+                        "format": ",.0f",
+                        "title": "24-m mean"
+                    },
+                    {
+                        "field": "anomaly",
+                        "type": "quantitative",
+                        "format": ",.0f",
+                        "title": "Anomaly"
+                    },
+                    {
+                        "field": "anomaly_pct",
+                        "type": "quantitative",
+                        "format": ".0%",
+                        "title": "Anomaly %"
+                    }
+                ]
+            }
+        },
+
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "filter": "datum.AIRPORT == 'All Australian Airports'" },
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+                { "timeUnit": "yearmonth", "field": "dt", "as": "ym" },
+                {
+                    "aggregate": [
+                        {
+                            "op": "sum",
+                            "field": "Pax_Total",
+                            "as": "national_total"
+                        }
+                    ],
+                    "groupby": ["ym"]
+                },
+                {
+                    "joinaggregate": [
+                        {
+                            "op": "mean",
+                            "field": "national_total",
+                            "as": "mean_nat"
+                        }
+                    ]
+                },
+                {
+                    "calculate": "datum.national_total - datum.mean_nat",
+                    "as": "anomaly"
+                },
+                {
+                    "calculate": "datum.anomaly / datum.mean_nat",
+                    "as": "anomaly_pct"
+                },
+                {
+                    "filter": "datum.anomaly >= 0 && abs(datum.anomaly_pct) >= 0.01"
+                }
+            ],
+            "mark": {
+                "type": "text",
+                "fontSize": 11,
+                "align": "center",
+                "baseline": "top",
+                "fill": "#000000",
+                "clip": true
+            },
+            "encoding": {
+                "x": {
+                    "field": "ym",
+                    "type": "temporal",
+                    "timeUnit": "yearmonth",
+                    "bandPosition": 0.5
+                },
+                "y": { "field": "anomaly", "type": "quantitative" },
+                "text": {
+                    "field": "anomaly_pct",
+                    "type": "quantitative",
+                    "format": ".0%"
+                },
+                "dy": { "value": 4 }
+            }
+        },
+
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "filter": "datum.AIRPORT == 'All Australian Airports'" },
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+                { "timeUnit": "yearmonth", "field": "dt", "as": "ym" },
+                {
+                    "aggregate": [
+                        {
+                            "op": "sum",
+                            "field": "Pax_Total",
+                            "as": "national_total"
+                        }
+                    ],
+                    "groupby": ["ym"]
+                },
+                {
+                    "joinaggregate": [
+                        {
+                            "op": "mean",
+                            "field": "national_total",
+                            "as": "mean_nat"
+                        }
+                    ]
+                },
+                {
+                    "calculate": "datum.national_total - datum.mean_nat",
+                    "as": "anomaly"
+                },
+                {
+                    "calculate": "datum.anomaly / datum.mean_nat",
+                    "as": "anomaly_pct"
+                },
+                {
+                    "filter": "datum.anomaly < 0 && abs(datum.anomaly_pct) >= 0.01"
+                }
+            ],
+            "mark": {
+                "type": "text",
+                "fontSize": 11,
+                "align": "center",
+                "baseline": "bottom",
+                "fill": "#000000",
+                "clip": true
+            },
+            "encoding": {
+                "x": {
+                    "field": "ym",
+                    "type": "temporal",
+                    "timeUnit": "yearmonth",
+                    "bandPosition": 0.5
+                },
+                "y": { "field": "anomaly", "type": "quantitative" },
+                "text": {
+                    "field": "anomaly_pct",
+                    "type": "quantitative",
+                    "format": ".0%"
+                },
+                "dy": { "value": -4 }
+            }
+        }
+    ],
+    "config": { "view": { "stroke": null }, "axis": { "grid": false } }
+}

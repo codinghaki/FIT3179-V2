@@ -1,0 +1,118 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Busiest Month per Airport",
+
+    "width": "container",
+
+    "height": 200,
+
+    "data": { "url": "data/passenger_data_two_year.csv" },
+
+    "transform": [
+        { "filter": "datum.AIRPORT !== 'All Australian Airports'" },
+        { "calculate": "toDate(datum.ym)", "as": "dt" },
+        { "timeUnit": "yearmonth", "field": "dt", "as": "ym" },
+        {
+            "aggregate": [
+                { "op": "sum", "field": "Pax_Total", "as": "month_total" }
+            ],
+            "groupby": ["AIRPORT", "ym"]
+        },
+        {
+            "window": [{ "op": "rank", "as": "rk" }],
+            "sort": [{ "field": "month_total", "order": "descending" }],
+            "groupby": ["AIRPORT"]
+        },
+        { "filter": "datum.rk==1" },
+        { "calculate": "month(toDate(datum.ym))", "as": "mm" },
+        {
+            "calculate": "['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][datum.mm]",
+            "as": "month_name"
+        }
+    ],
+
+    "layer": [
+        {
+            "mark": { "type": "bar", "cornerRadiusEnd": 3 },
+            "encoding": {
+                "x": {
+                    "field": "month_name",
+                    "type": "ordinal",
+                    "sort": [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec"
+                    ],
+                    "title": null,
+                    "axis": { "grid": false }
+                },
+                "y": {
+                    "aggregate": "count",
+                    "type": "quantitative",
+                    "axis": null
+                },
+                "color": {
+                    "condition": {
+                        "test": "datum.month_name==='Dec' || datum.month_name==='Jan'",
+                        "value": "#f59e0b"
+                    },
+                    "value": "#94a3b8"
+                },
+                "tooltip": [
+                    { "aggregate": "count", "title": "Airports" },
+                    { "field": "month_name", "title": "Month" }
+                ]
+            }
+        },
+
+        {
+            "mark": {
+                "type": "text",
+                "fontSize": 12,
+                "fontWeight": "bold",
+                "align": "center",
+                "baseline": "bottom",
+                "dy": -4
+            },
+            "encoding": {
+                "x": {
+                    "field": "month_name",
+                    "type": "ordinal",
+                    "sort": [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec"
+                    ]
+                },
+                "y": { "aggregate": "count", "type": "quantitative" },
+                "text": {
+                    "aggregate": "count",
+                    "type": "quantitative",
+                    "format": "d"
+                },
+                "color": { "value": "#111" }
+            }
+        }
+    ],
+
+    "config": { "view": { "stroke": null } }
+}

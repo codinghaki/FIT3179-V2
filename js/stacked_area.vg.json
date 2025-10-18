@@ -1,0 +1,133 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Passenger totals",
+
+    "width": "container",
+
+    "height": 390,
+
+    "layer": [
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+                { "calculate": "month(datum.dt)", "as": "mm" },
+                {
+                    "filter": "datum.mm == 11 || datum.mm == 0 || datum.mm == 1"
+                },
+                {
+                    "aggregate": [{ "op": "count", "as": "rows" }],
+                    "groupby": ["dt"]
+                }
+            ],
+            "mark": {
+                "type": "rule",
+                "stroke": "#f59e0b",
+                "strokeWidth": 35,
+                "opacity": 0.5
+            },
+            "encoding": { "x": { "field": "dt", "type": "temporal" } }
+        },
+
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "filter": "datum.AIRPORT !== 'All Australian Airports'" },
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+
+                {
+                    "fold": ["Dom_Pax_Total", "Int_Pax_Total"],
+                    "as": ["key", "value"]
+                },
+                {
+                    "calculate": "datum.key === 'Dom_Pax_Total' ? 'Domestic' : 'International'",
+                    "as": "flow"
+                },
+
+                {
+                    "aggregate": [
+                        { "op": "sum", "field": "value", "as": "passengers" }
+                    ],
+                    "groupby": ["dt", "flow"]
+                }
+            ],
+            "mark": { "type": "area" },
+            "encoding": {
+                "x": { "field": "dt", "type": "temporal", "title": "Month" },
+                "y": {
+                    "field": "passengers",
+                    "type": "quantitative",
+                    "title": "Passengers per month",
+                    "axis": { "format": "~s" },
+                    "stack": "zero"
+                },
+                "color": {
+                    "field": "flow",
+                    "type": "nominal",
+                    "title": null,
+                    "scale": {
+                        "domain": ["Domestic", "International"],
+                        "range": ["#090088", "#ff8c69"]
+                    },
+                    "legend": {
+                        "orient": "top-left",
+                        "direction": "horizontal"
+                    }
+                },
+                "tooltip": [
+                    { "field": "dt", "type": "temporal", "title": "Month" },
+                    { "field": "flow", "title": "Type" },
+                    {
+                        "field": "passengers",
+                        "type": "quantitative",
+                        "format": ",",
+                        "title": "Passengers"
+                    }
+                ]
+            }
+        },
+
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "filter": "datum.AIRPORT !== 'All Australian Airports'" },
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+                {
+                    "aggregate": [
+                        {
+                            "op": "sum",
+                            "field": "Pax_Total",
+                            "as": "national_total"
+                        }
+                    ],
+                    "groupby": ["dt"]
+                }
+            ],
+            "mark": {
+                "type": "line",
+                "stroke": "#0f172a",
+                "strokeWidth": 2,
+                "opacity": 0.9
+            },
+            "encoding": {
+                "x": { "field": "dt", "type": "temporal" },
+                "y": { "field": "national_total", "type": "quantitative" },
+                "tooltip": [
+                    { "field": "dt", "type": "temporal", "title": "Month" },
+                    {
+                        "field": "national_total",
+                        "type": "quantitative",
+                        "format": ",",
+                        "title": "Total"
+                    }
+                ]
+            }
+        }
+    ],
+
+    "config": {
+        "view": { "stroke": null },
+        "legend": { "padding": 6, "labelLimit": 180 }
+    }
+}

@@ -1,0 +1,158 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Lift compared to total movements",
+
+    "width": "container",
+
+    "height": 425,
+
+    "data": { "url": "data/passenger_data_two_year.csv" },
+
+    "transform": [
+        { "filter": "datum.AIRPORT !== 'All Australian Airports'" },
+        { "calculate": "toDate(datum.ym)", "as": "dt" },
+        { "calculate": "month(datum.dt)", "as": "mm" },
+        {
+            "calculate": "(datum.mm==11 || datum.mm==0 || datum.mm==1) ? 'Summer' : 'Other'",
+            "as": "SO"
+        },
+        {
+            "aggregate": [
+                { "op": "mean", "field": "Pax_Total", "as": "avg_month" }
+            ],
+            "groupby": ["AIRPORT", "SO"]
+        },
+        { "pivot": "SO", "value": "avg_month", "groupby": ["AIRPORT"] },
+        { "calculate": "datum.Summer", "as": "avg_summer" },
+        { "calculate": "datum.Other", "as": "avg_other" },
+        {
+            "calculate": "datum.avg_summer*6 + datum.avg_other*18",
+            "as": "Total_2y"
+        },
+        {
+            "calculate": "datum.avg_other>0 ? (datum.avg_summer - datum.avg_other)/datum.avg_other : null",
+            "as": "lift"
+        },
+        { "filter": "isValid(datum.avg_summer) && isValid(datum.avg_other)" }
+    ],
+
+    "layer": [
+        {
+            "data": {
+                "values": [
+                    { "xv": 60000, "yv": 60000 },
+                    { "xv": 5000000, "yv": 5000000 }
+                ]
+            },
+            "mark": {
+                "type": "line",
+                "color": "#9ca3af",
+                "strokeDash": [4, 4],
+                "strokeWidth": 1.5
+            },
+            "encoding": {
+                "x": {
+                    "field": "xv",
+                    "type": "quantitative",
+                    "scale": { "type": "log", "domain": [60000, 5000000] },
+                    "axis": {
+                        "values": [
+                            80000, 100000, 200000, 500000, 1000000, 2000000,
+                            4000000
+                        ],
+                        "format": "~s",
+                        "grid": true,
+                        "gridDash": [2, 2],
+                        "gridOpacity": 0.25
+                    }
+                },
+                "y": {
+                    "field": "yv",
+                    "type": "quantitative",
+                    "scale": { "type": "log", "domain": [60000, 5000000] },
+                    "axis": {
+                        "values": [
+                            80000, 100000, 200000, 500000, 1000000, 2000000,
+                            4000000
+                        ],
+                        "format": "~s",
+                        "grid": true,
+                        "gridDash": [2, 2],
+                        "gridOpacity": 0.25
+                    }
+                }
+            }
+        },
+
+        {
+            "mark": {
+                "type": "circle",
+                "opacity": 0.9,
+                "stroke": "white",
+                "strokeWidth": 0.6,
+                "clip": true
+            },
+            "encoding": {
+                "x": {
+                    "field": "avg_other",
+                    "type": "quantitative",
+                    "title": "Avg month (Other)",
+                    "scale": { "type": "log", "domain": [60000, 4000000] }
+                },
+                "y": {
+                    "field": "avg_summer",
+                    "type": "quantitative",
+                    "title": "Avg month (Summer)",
+                    "scale": { "type": "log", "domain": [60000, 4000000] }
+                },
+                "size": {
+                    "field": "Total_2y",
+                    "type": "quantitative",
+                    "scale": {
+                        "type": "sqrt",
+                        "domain": [3000000, 80000000],
+                        "range": [100, 3000],
+                        "clamp": true
+                    },
+                    "legend": {
+                        "title": "Total passengers (2y)",
+                        "format": "~s",
+                        "symbolType": "circle"
+                    }
+                },
+                "color": {
+                    "field": "lift",
+                    "type": "quantitative",
+                    "title": "Summer lift",
+                    "scale": {
+                        "domain": [-0.25, 0, 0.25],
+                        "range": ["#3b82f6", "#e5e7eb", "#f59e0b"]
+                    },
+                    "legend": { "format": ".0%" }
+                },
+                "tooltip": [
+                    { "field": "AIRPORT", "title": "Airport" },
+                    {
+                        "field": "avg_summer",
+                        "title": "Avg summer",
+                        "format": ",.0f"
+                    },
+                    {
+                        "field": "avg_other",
+                        "title": "Avg other",
+                        "format": ",.0f"
+                    },
+                    { "field": "lift", "title": "Lift", "format": ".0%" },
+                    {
+                        "field": "Total_2y",
+                        "title": "Total (≈)",
+                        "format": ",.0f"
+                    }
+                ]
+            }
+        }
+    ],
+
+    "config": { "view": { "stroke": null } }
+}

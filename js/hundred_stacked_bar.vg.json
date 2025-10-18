@@ -1,0 +1,104 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Monthly Domestic vs International Share",
+
+    "width": "container",
+
+    "height": 390,
+
+    "params": [
+        {
+            "name": "apSel",
+            "value": "All Australian Airports",
+            "bind": {
+                "input": "select",
+                "options": [
+                    "All Australian Airports",
+                    "SYDNEY",
+                    "MELBOURNE",
+                    "BRISBANE",
+                    "PERTH",
+                    "ADELAIDE",
+                    "GOLD COAST",
+                    "CANBERRA",
+                    "BALLINA",
+                    "CAIRNS",
+                    "DARWIN",
+                    "HAMILTON ISLAND",
+                    "HOBART",
+                    "KARRATHA",
+                    "LAUNCESTON",
+                    "MACKAY",
+                    "NEWCASTLE",
+                    "PROSERPINE",
+                    "ROCKHAMPTON",
+                    "SUNSHINE COAST",
+                    "TOWNSVILLE"
+                ],
+                "name": "Airport: "
+            }
+        }
+    ],
+
+    "data": { "url": "data/passenger_data_two_year.csv" },
+
+    "transform": [
+        { "filter": "datum.AIRPORT === apSel" },
+
+        { "calculate": "toDate(datum.ym)", "as": "dt" },
+        { "calculate": "month(datum.dt)", "as": "mm" },
+
+        {
+            "fold": ["Dom_Pax_Total", "Int_Pax_Total"],
+            "as": ["key", "Passengers"]
+        },
+        {
+            "calculate": "datum.key === 'Dom_Pax_Total' ? 'Domestic' : 'International'",
+            "as": "Type"
+        },
+
+        {
+            "aggregate": [{ "op": "sum", "field": "Passengers", "as": "pax" }],
+            "groupby": ["mm", "Type"]
+        }
+    ],
+
+    "mark": "bar",
+
+    "encoding": {
+        "x": {
+            "field": "mm",
+            "type": "ordinal",
+            "title": "Month",
+            "sort": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            "axis": {
+                "labelExpr": "timeFormat(datetime(2000, datum.value, 1), '%b')"
+            }
+        },
+        "y": {
+            "aggregate": "sum",
+            "field": "pax",
+            "type": "quantitative",
+            "stack": "normalize",
+            "title": "Share of monthly passengers"
+        },
+        "color": {
+            "field": "Type",
+            "title": null,
+            "scale": {
+                "domain": ["Domestic", "International"],
+                "range": ["#090088", "#ff8c69"]
+            }
+        },
+        "tooltip": [
+            { "field": "Type" },
+            {
+                "aggregate": "sum",
+                "field": "pax",
+                "title": "Passengers",
+                "format": ",.0f"
+            }
+        ]
+    }
+}

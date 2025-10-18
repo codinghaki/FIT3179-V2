@@ -1,0 +1,118 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Top 6 Airports by movements",
+
+    "width": "container",
+
+    "height": 400,
+
+    "layer": [
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "filter": "datum.AIRPORT !== 'All Australian Airports'" },
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+                { "calculate": "month(datum.dt)", "as": "mm" },
+                { "timeUnit": "yearmonth", "field": "dt", "as": "ym" },
+                {
+                    "filter": "datum.mm == 11 || datum.mm == 0 || datum.mm == 1"
+                },
+                {
+                    "aggregate": [{ "op": "count", "as": "rows" }],
+                    "groupby": ["ym"]
+                }
+            ],
+            "mark": { "type": "bar", "color": "#f59e0b", "opacity": 0.28 },
+            "encoding": {
+                "x": {
+                    "field": "ym",
+                    "type": "temporal",
+                    "timeUnit": "yearmonth",
+                    "axis": { "tickBand": "center" }
+                },
+                "y": { "value": 0 },
+                "y2": { "value": 400 }
+            }
+        },
+
+        {
+            "data": { "url": "data/passenger_data_two_year.csv" },
+            "transform": [
+                { "filter": "datum.AIRPORT !== 'All Australian Airports'" },
+                {
+                    "joinaggregate": [
+                        { "op": "sum", "field": "Pax_Total", "as": "tot_24m" }
+                    ],
+                    "groupby": ["AIRPORT"]
+                },
+                {
+                    "window": [{ "op": "dense_rank", "as": "rank_by_total" }],
+                    "sort": [{ "field": "tot_24m", "order": "descending" }],
+                    "ignorePeers": true
+                },
+                { "filter": "datum.rank_by_total <= 6" },
+                { "calculate": "toDate(datum.ym)", "as": "dt" },
+                { "timeUnit": "yearmonth", "field": "dt", "as": "ym" }
+            ],
+            "mark": { "type": "line", "point": true, "strokeWidth": 2 },
+            "encoding": {
+                "x": {
+                    "field": "ym",
+                    "type": "temporal",
+                    "timeUnit": "yearmonth",
+                    "axis": { "title": null, "tickBand": "center" }
+                },
+                "y": {
+                    "field": "Pax_Total",
+                    "type": "quantitative",
+                    "title": "Passengers per month",
+                    "axis": { "format": "~s" }
+                },
+                "color": {
+                    "field": "AIRPORT",
+                    "type": "nominal",
+                    "title": "Airport",
+                    "scale": {
+                        "domain": [
+                            "SYDNEY",
+                            "MELBOURNE",
+                            "BRISBANE",
+                            "PERTH",
+                            "ADELAIDE",
+                            "GOLD COAST"
+                        ],
+                        "range": [
+                            "#1f77b4",
+                            "#ff7f0e",
+                            "#2ca02c",
+                            "#d62728",
+                            "#9467bd",
+                            "#8c564b"
+                        ]
+                    }
+                },
+                "detail": { "field": "AIRPORT" },
+                "order": { "field": "ym", "type": "temporal" },
+                "tooltip": [
+                    { "field": "AIRPORT", "title": "Airport" },
+                    { "field": "ym", "type": "temporal", "title": "Month" },
+                    {
+                        "field": "Pax_Total",
+                        "type": "quantitative",
+                        "format": ",",
+                        "title": "Passengers"
+                    },
+                    {
+                        "field": "tot_24m",
+                        "type": "quantitative",
+                        "format": ",",
+                        "title": "24-month total"
+                    }
+                ]
+            }
+        }
+    ],
+
+    "config": { "view": { "stroke": null } }
+}

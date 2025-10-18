@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Import Vega & Vega-Lite (does not have to be from CDN) -->
+        <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
+
+        <!-- CSS file -->
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="css/layout.css"
+            media="all"
+        />
+
+        <!-- Pure CSS -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+            integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls"
+            crossorigin="anonymous"
+        />
+
+        <!-- Pure CSS grids -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css"
+        />
+    </head>
+
+    <body>
+        <div class="page">
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <h1 class="rhetorical">
+                        <u>Do Aussies Really Travel More in Summer?</u>
+                    </h1>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <em>
+                        A 24-month look at the top 20 Australian airports by
+                        passenger movements (Jun 2023-Jun 2025) to test whether
+                        summer is truly the busiest. Keep an eye out for summer
+                        months highlighted in yellow!</em
+                    >
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <h2 class="rhetorical">
+                        <u>A snapshot of the past 24 months</u>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <div id="map_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec0 = 'js/map_visualisation.vg.json';
+                            vegaEmbed('#map_container', spec0, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <h2 class="rhetorical"><u>An analysis on summer</u></h2>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-3-4 anomaly_container">
+                    <div id="anomaly_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec1 = 'js/anomaly_chart.vg.json';
+                            vegaEmbed('#anomaly_container', spec1, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+                <div class="pure-u-1-4 description-right">
+                    <h4>A Clear Pattern</h4>
+                    <span>
+                        Oct/Dec/Jan well above average. <br />
+                        <br />
+                        Feb/Jun dip just as much. <br />
+                        <br />
+                        Summer isn't a universal surge.</span
+                    >
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-3-5">
+                    <div id="monthly_avg_bar_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec3 = 'js/monthly_avg_bar_chart.vg.json';
+                            vegaEmbed('#monthly_avg_bar_container', spec3, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+
+                <div class="pure-u-1-5 description-middle">
+                    <h4>January peaks</h4>
+                    <span>
+                        January just edges out 2nd place in most cases.
+                    </span>
+                    <h4>Exclusive blitz</h4>
+                    <span>
+                        Smaller airports don't share the same January
+                        dominance.</span
+                    >
+                </div>
+
+                <div class="pure-u-1-5">
+                    <div id="tally_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec2 = 'js/month_tally_bar_chart.vg.json';
+                            vegaEmbed('#tally_container', spec2, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1-5 description-right">
+                    <h4>Hubs vs Localities</h4>
+                    <span
+                        >Large hubs see roughly +5% increase in summer; small
+                        airports vary widely (-15% to +25%).
+                    </span>
+                </div>
+                <div class="pure-u-4-5">
+                    <div id="lift_chart_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec4 = 'js/summer_lift_bars.vg.json';
+                            vegaEmbed('#lift_chart_container', spec4, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <div
+                        id="summer_other_scatter_container"
+                        class="vis-container"
+                    >
+                        <script type="text/javascript">
+                            var spec5 = 'js/summer_other_scatter.vg.json';
+                            vegaEmbed(
+                                '#summer_other_scatter_container',
+                                spec5,
+                                {
+                                    'actions': false,
+                                    loader: {
+                                        baseURL:
+                                            'https://codinghaki.github.io/FIT3179-V2/',
+                                    },
+                                }
+                            )
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <h2 class="rhetorical"><u>What about destination?</u></h2>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1-2">
+                    <div id="hundred_stacked_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec6 = 'js/hundred_stacked_bar.vg.json';
+                            vegaEmbed('#hundred_stacked_container', spec6, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+                <div class="pure-u-1-2">
+                    <div id="stacked_area_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec = 'js/stacked_area.vg.json';
+                            vegaEmbed('#stacked_area_container', spec, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <h4>Summer = Overseas</h4>
+                    <span
+                        >December and January are obvious spikes to the quite
+                        stable domestic:international ratio. February is higher
+                        than average likely from everyone returning.</span
+                    >
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <h2 class="rhetorical">
+                        <u>Does Summer shake up the biggest airports?</u>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1-2">
+                    <div id="line_chart_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec7 = 'js/top_six_line_chart.vg.json';
+                            vegaEmbed('#line_chart_container', spec7, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+                <div class="pure-u-1-2">
+                    <div id="sorted_share_bar_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec8 = 'js/sorted_share_bars.vg.json';
+                            vegaEmbed('#sorted_share_bar_container', spec8, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <h4>All-year dominance</h4>
+                    <span>
+                        Top-six ranks are remarkably stable month-to-month
+                        (seasonality ≠ rank shake-ups).</span
+                    >
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <h2 class="rhetorical">
+                        <u>So...is summer truly "when aussies travel"?</u>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-2-3">
+                    <div id="heatmap_container" class="vis-container">
+                        <script type="text/javascript">
+                            var spec9 = 'js/heatmap.vg.json';
+                            vegaEmbed('#heatmap_container', spec9, {
+                                'actions': false,
+                                loader: {
+                                    baseURL:
+                                        'https://codinghaki.github.io/FIT3179-V2/',
+                                },
+                            })
+                                .then(function (result) {
+                                    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                                })
+                                .catch(console.error);
+                        </script>
+                    </div>
+                </div>
+                <div class="pure-u-1-3 description-right">
+                    <h4>Sort of...</h4>
+                    <span
+                        >Partly. Summer helps at the largest hubs and some
+                        leisure airports, but it's not universally the peak.
+                        October frequently rivals summer, and February often
+                        dips. The data points to a nuanced seasonality rather
+                        than a blanket summer surge.</span
+                    >
+                </div>
+            </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1">
+                    <span>Author: Liam James, 18/10/25</span>
+                </div>
+                <div class="pure-u-1">
+                    <span
+                        >Sources:
+                        <a href="https://ourairports.com/data/"
+                            >https://ourairports.com/data/</a
+                        >,
+                        <a
+                            href="https://www.data.gov.au/data/dataset/airport-traffic-data"
+                            >https://www.data.gov.au/data/dataset/airport-traffic-data</a
+                        >,
+                        <a
+                            href="https://web.archive.org/web/20160401114149/http://www.ga.gov.au/scientific-topics/national-location-information/dimensions/centre-of-australia-states-territories"
+                            >https://web.archive.org/web/20160401114149/http://www.ga.gov.au/scientific-topics/national-location-information/dimensions/centre-of-australia-states-territories</a
+                        >,
+                        <a
+                            href="https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/1270.0.55.001July%202016?OpenDocument"
+                            >https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/1270.0.55.001July%202016?OpenDocument</a
+                        >
+                    </span>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

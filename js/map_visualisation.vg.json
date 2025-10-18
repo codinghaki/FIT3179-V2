@@ -1,0 +1,146 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "background": "#DEF3F6",
+
+    "width": "container",
+
+    "height": 450,
+
+    "title": "Top 20 Australian Airports by total Passenger Movements across Jun 2023-Jun 2025",
+
+    "projection": {
+        "type": "conicEqualArea",
+        "parallels": [-37.9875337, -16.1259931],
+        "rotate": [-133.1542969, 0, 0],
+        "center": [0, -27.0567634],
+        "scale": 700,
+        "translate": [480, 225],
+        "precision": 0.1
+    },
+
+    "config": {
+        "view": { "stroke": "#e5e7eb" },
+        "title": { "anchor": "start" }
+    },
+
+    "layer": [
+        {
+            "data": {
+                "url": "data/basemap.json",
+                "format": { "type": "topojson", "feature": "STE_2016_AUST" }
+            },
+            "mark": {
+                "type": "geoshape",
+                "fill": "#FEFBEA",
+                "stroke": "#c7c7c7"
+            }
+        },
+
+        {
+            "data": {
+                "url": "data/basemap.json",
+                "format": {
+                    "type": "topojson",
+                    "feature": "ne_110m_graticules_10"
+                }
+            },
+            "mark": {
+                "type": "geoshape",
+                "fill": null,
+                "stroke": "#d9d9d9",
+                "strokeWidth": 0.8
+            }
+        },
+
+        {
+            "data": { "url": "data/aus_states.csv" },
+            "mark": {
+                "type": "text",
+                "fontSize": 7,
+                "fill": "#555"
+            },
+            "encoding": {
+                "longitude": { "field": "long", "type": "quantitative" },
+                "latitude": { "field": "lat", "type": "quantitative" },
+                "text": { "field": "state", "type": "nominal" }
+            }
+        },
+
+        {
+            "data": { "url": "data/airports_relevant_and_aggregate.csv" },
+            "mark": {
+                "type": "circle",
+                "opacity": 0.7,
+                "stroke": "white",
+                "strokeWidth": 0.6,
+                "tooltip": true
+            },
+            "encoding": {
+                "longitude": {
+                    "field": "longitude_deg",
+                    "type": "quantitative"
+                },
+                "latitude": { "field": "latitude_deg", "type": "quantitative" },
+                "size": {
+                    "field": "pax_24mo",
+                    "type": "quantitative",
+                    "title": "Passengers (24 months)",
+                    "scale": {
+                        "type": "threshold",
+                        "domain": [
+                            3000000, 5000000, 10000000, 15000000, 25000000,
+                            40000000, 60000000, 80000000
+                        ],
+                        "range": [140, 200, 280, 380, 500, 700, 825, 975, 1300]
+                    },
+                    "legend": {
+                        "title": "Passengers (24 Months)",
+                        "format": ".2s",
+                        "orient": "none",
+                        "legendX": 780,
+                        "legendY": 50,
+                        "direction": "vertical",
+                        "symbolFillColor": "#0b4aa7",
+                        "symbolStrokeColor": "white",
+                        "symbolStrokeWidth": 0.6
+                    }
+                },
+                "color": {
+                    "field": "pax_24mo",
+                    "type": "quantitative",
+                    "title": "Passengers (24 Months)",
+                    "scale": {
+                        "type": "threshold",
+                        "domain": [
+                            3000000, 5000000, 10000000, 15000000, 25000000,
+                            40000000, 60000000, 80000000
+                        ],
+                        "range": [
+                            "#482878",
+                            "#3e4989",
+                            "#31688e",
+                            "#26828e",
+                            "#1f9e89",
+                            "#35b779",
+                            "#6ece58",
+                            "#b8de29"
+                        ]
+                    }
+                },
+                "tooltip": [
+                    { "field": "name", "title": "Airport" },
+                    {
+                        "field": "iata_code",
+                        "title": "IATA (Commercial identifier)"
+                    },
+                    {
+                        "field": "pax_24mo",
+                        "title": "Passengers movements",
+                        "format": ","
+                    }
+                ]
+            }
+        }
+    ]
+}

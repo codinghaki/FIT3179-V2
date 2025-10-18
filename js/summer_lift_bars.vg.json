@@ -1,0 +1,93 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Summer Lift by Airport — (Summer vs Other seasons)",
+
+    "width": "container",
+
+    "height": 300,
+
+    "data": { "url": "data/passenger_data_two_year.csv" },
+
+    "transform": [
+        { "filter": "datum.AIRPORT !== 'All Australian Airports'" },
+        { "calculate": "toDate(datum.ym)", "as": "dt" },
+        { "calculate": "month(datum.dt)", "as": "mm" },
+        {
+            "calculate": "(datum.mm==11 || datum.mm==0 || datum.mm==1) ? 'Summer':'Other'",
+            "as": "SO"
+        },
+
+        {
+            "aggregate": [
+                { "op": "mean", "field": "Pax_Total", "as": "avg_month" }
+            ],
+            "groupby": ["AIRPORT", "SO"]
+        },
+        { "pivot": "SO", "value": "avg_month", "groupby": ["AIRPORT"] },
+
+        {
+            "joinaggregate": [
+                { "op": "sum", "field": "Pax_Total", "as": "tot_24m" }
+            ],
+            "groupby": ["AIRPORT"]
+        },
+
+        {
+            "calculate": "datum.Other>0 ? (datum.Summer-datum.Other)/datum.Other : null",
+            "as": "lift"
+        },
+        { "filter": "isValid(datum.lift)" },
+
+        {
+            "window": [{ "op": "rank", "as": "rk" }],
+            "sort": [{ "field": "tot_24m", "order": "descending" }]
+        },
+
+        {
+            "window": [{ "op": "rank", "as": "rk_lift" }],
+            "sort": [{ "field": "lift", "order": "descending" }]
+        }
+    ],
+    "mark": { "type": "bar", "cornerRadiusEnd": 3 },
+    "encoding": {
+        "y": {
+            "field": "AIRPORT",
+            "type": "nominal",
+            "sort": { "field": "lift", "order": "descending" },
+            "title": null
+        },
+        "x": {
+            "field": "lift",
+            "type": "quantitative",
+            "axis": { "format": ".0%" },
+            "title": "Summer lift vs Other"
+        },
+        "color": {
+            "condition": { "test": "datum.lift >= 0", "value": "#f59e0b" },
+            "value": "#257ca3"
+        },
+        "tooltip": [
+            { "field": "AIRPORT" },
+            {
+                "field": "Summer",
+                "type": "quantitative",
+                "format": ",.0f",
+                "title": "Avg month (Summer)"
+            },
+            {
+                "field": "Other",
+                "type": "quantitative",
+                "format": ",.0f",
+                "title": "Avg month (Other)"
+            },
+            {
+                "field": "lift",
+                "type": "quantitative",
+                "format": ".0%",
+                "title": "Lift"
+            }
+        ]
+    },
+    "config": { "view": { "stroke": null } }
+}

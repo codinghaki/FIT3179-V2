@@ -1,0 +1,121 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Airport Share of National Total",
+
+    "width": "container",
+
+    "params": [
+        {
+            "name": "monthSel",
+            "value": 11,
+            "bind": {
+                "input": "select",
+                "options": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                "labels": [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec"
+                ],
+                "name": "Month: "
+            }
+        }
+    ],
+
+    "data": { "url": "data/passenger_data_two_year.csv" },
+
+    "transform": [
+        { "filter": "datum.AIRPORT !== 'All Australian Airports'" },
+        { "calculate": "toDate(datum.ym)", "as": "dt" },
+        { "calculate": "month(datum.dt)", "as": "mm" },
+        { "filter": "datum.mm === monthSel" },
+
+        {
+            "aggregate": [
+                { "op": "sum", "field": "Pax_Total", "as": "month_sum" }
+            ],
+            "groupby": ["AIRPORT"]
+        },
+        {
+            "joinaggregate": [
+                { "op": "sum", "field": "month_sum", "as": "grand_total" }
+            ]
+        },
+        {
+            "calculate": "datum.grand_total > 0 ? datum.month_sum / datum.grand_total : null",
+            "as": "share"
+        }
+    ],
+
+    "mark": { "type": "bar", "cornerRadiusEnd": 3 },
+
+    "encoding": {
+        "y": {
+            "field": "AIRPORT",
+            "type": "nominal",
+            "sort": "-x",
+            "title": null
+        },
+        "x": {
+            "field": "share",
+            "type": "quantitative",
+            "axis": { "format": ".0%" },
+            "title": "Share of national total"
+        },
+
+        "color": {
+            "condition": {
+                "test": "indexof(['SYDNEY','MELBOURNE','BRISBANE','PERTH','ADELAIDE','GOLD COAST'], datum.AIRPORT) >= 0",
+                "field": "AIRPORT",
+                "type": "nominal",
+                "scale": {
+                    "domain": [
+                        "SYDNEY",
+                        "MELBOURNE",
+                        "BRISBANE",
+                        "PERTH",
+                        "ADELAIDE",
+                        "GOLD COAST"
+                    ],
+                    "range": [
+                        "#1f77b4",
+                        "#ff7f0e",
+                        "#2ca02c",
+                        "#d62728",
+                        "#9467bd",
+                        "#8c564b"
+                    ]
+                },
+                "legend": null
+            },
+            "value": "#cbd5e1"
+        },
+
+        "tooltip": [
+            { "field": "AIRPORT" },
+            {
+                "field": "month_sum",
+                "type": "quantitative",
+                "format": ",.0f",
+                "title": "Passengers (month)"
+            },
+            {
+                "field": "share",
+                "type": "quantitative",
+                "format": ".1%",
+                "title": "Share of national"
+            }
+        ]
+    },
+
+    "config": { "view": { "stroke": null } }
+}

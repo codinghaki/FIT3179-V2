@@ -1,0 +1,138 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+    "title": "Monthly Averages",
+
+    "width": "container",
+
+    "height": 200,
+
+    "params": [
+        {
+            "name": "airportSel",
+            "value": "All Australian Airports",
+            "bind": {
+                "input": "select",
+                "options": [
+                    "All Australian Airports",
+                    "SYDNEY",
+                    "MELBOURNE",
+                    "BRISBANE",
+                    "PERTH",
+                    "ADELAIDE",
+                    "GOLD COAST",
+                    "CANBERRA",
+                    "BALLINA",
+                    "CAIRNS",
+                    "DARWIN",
+                    "HAMILTON ISLAND",
+                    "HOBART",
+                    "KARRATHA",
+                    "LAUNCESTON",
+                    "MACKAY",
+                    "NEWCASTLE",
+                    "PROSERPINE",
+                    "ROCKHAMPTON",
+                    "SUNSHINE COAST",
+                    "TOWNSVILLE"
+                ]
+            }
+        }
+    ],
+
+    "data": { "url": "data/passenger_data_two_year.csv" },
+
+    "transform": [
+        { "calculate": "toDate(datum.ym)", "as": "dt" },
+
+        { "calculate": "year(datum.dt)", "as": "yy" },
+
+        { "calculate": "month(datum.dt)", "as": "mm" },
+
+        {
+            "filter": "airportSel === 'All Australian Airports' ? datum.AIRPORT === 'All Australian Airports' : datum.AIRPORT === airportSel"
+        },
+
+        {
+            "aggregate": [
+                { "op": "sum", "field": "Pax_Total", "as": "total_month" }
+            ],
+            "groupby": ["yy", "mm"]
+        },
+
+        {
+            "aggregate": [
+                { "op": "mean", "field": "total_month", "as": "avg_total" },
+                { "op": "min", "field": "total_month", "as": "min_total" },
+                { "op": "max", "field": "total_month", "as": "max_total" },
+                { "op": "count", "field": "total_month", "as": "n_years" }
+            ],
+            "groupby": ["mm"]
+        },
+
+        {
+            "calculate": "timeFormat(datetime(2000, datum.mm, 1), '%b')",
+            "as": "monLbl"
+        },
+
+        {
+            "calculate": "datum.mm==11 || datum.mm==0 || datum.mm==1 ? 'Summer' : 'Other'",
+            "as": "season"
+        }
+    ],
+
+    "mark": {
+        "type": "bar",
+        "cornerRadiusTopLeft": 3,
+        "cornerRadiusTopRight": 3
+    },
+
+    "encoding": {
+        "x": {
+            "field": "monLbl",
+            "type": "ordinal",
+            "title": "Month",
+            "sort": { "field": "avg_total", "order": "descending" }
+        },
+        "y": {
+            "field": "avg_total",
+            "type": "quantitative",
+            "title": "Average passengers / month",
+            "axis": { "format": "~s" }
+        },
+        "color": {
+            "field": "season",
+            "type": "nominal",
+            "title": null,
+            "scale": {
+                "domain": ["Summer", "Other"],
+                "range": ["#f59e0b", "#94a3b8"]
+            },
+            "legend": null
+        },
+        "tooltip": [
+            { "field": "monLbl", "title": "Month" },
+            {
+                "field": "avg_total",
+                "type": "quantitative",
+                "format": ",.0f",
+                "title": "Avg (per month)"
+            },
+            {
+                "field": "min_total",
+                "type": "quantitative",
+                "format": ",.0f",
+                "title": "Min (year)"
+            },
+            {
+                "field": "max_total",
+                "type": "quantitative",
+                "format": ",.0f",
+                "title": "Max (year)"
+            },
+            { "field": "n_years", "type": "quantitative", "title": "# Years" }
+        ]
+    },
+
+    "config": { "view": { "stroke": null } }
+}
